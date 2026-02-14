@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Ultimate Gift Bubbles</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  font-family:Khmer OS Battambang;
+  background:linear-gradient(135deg,#FFD700,#FFE066,#FFB6C1);
+}
+
+/* Gift */
+.gift{
+  width:150px;
+  height:150px;
+  position:relative;
+  cursor:pointer;
+  z-index:2;
+}
+.box, .lid{
+  border-radius:10px;
+}
+.box{
+  width:100%;
+  height:100%;
+  background:#FFC107;
+  position:absolute;
+  bottom:0;
+  z-index:2;
+  transition:opacity 0.5s;
+}
+.lid{
+  width:100%;
+  height:40px;
+  background:#FFB300;
+  position:absolute;
+  top:0;
+  transform-origin:bottom;
+  transition:transform 0.6s ease;
+}
+.ribbon{
+  position:absolute;
+  width:20px;
+  height:100%;
+  background:white;
+  left:50%;
+  transform:translateX(-50%);
+}
+.gift.open .lid{
+  transform:rotateX(120deg);
+}
+
+/* Click Text */
+.click-text{
+  margin-top:20px;
+  font-size:20px;
+  font-weight:bold;
+  color:#B71C1C;
+  animation:blink 1.2s infinite;
+  z-index:2;
+}
+@keyframes blink{
+  0%,100%{opacity:1;}
+  50%{opacity:0.4;}
+}
+
+/* Flying Image Big */
+.fly-image{
+  position:absolute;
+  width:90vw;
+  max-height:90vh;
+  border-radius:15px;
+  opacity:0;
+  transform:translateY(0) scale(0.2);
+  transition:all 1s ease;
+  z-index:3;
+}
+.fly-image.show{
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(1.2);
+  opacity:1;
+}
+
+/* Halo Glow */
+.halo{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  box-shadow: 0 0 40px 20px rgba(255,182,193,0.7);
+  opacity:0;
+  animation:haloAnim 1.2s ease forwards;
+  z-index:2;
+}
+@keyframes haloAnim{
+  0%{transform:translate(-50%,-50%) scale(0.2); opacity:1;}
+  100%{transform:translate(-50%,-50%) scale(3); opacity:0;}
+}
+
+/* Name Tag */
+.name-tag{
+  position:absolute;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.6);
+  color:white;
+  padding:5px 12px;
+  border-radius:15px;
+  font-size:20px;
+  z-index:3;
+}
+
+/* Floating Bubbles */
+.bubble{
+  position:absolute;
+  bottom:-20px;
+  width:10px;
+  height:10px;
+  background:rgba(255,192,203,0.7);
+  border-radius:50%;
+  animation:bubbleUp linear forwards;
+}
+@keyframes bubbleUp{
+  0%{transform:translateY(0) scale(0.5); opacity:1;}
+  100%{transform:translateY(-110vh) scale(1.2); opacity:0;}
+}
+
+/* Confetti */
+.confetti{
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  animation:confettiFall 3s linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(110vh);}
+}
+
+/* Greeting */
+.greeting{
+  position:absolute;
+  top:10%;
+  width:100%;
+  text-align:center;
+  font-size:32px;
+  font-weight:bold;
+  color:#ff0686;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="gift" onclick="openGift()" id="gift">
+  <div class="lid"></div>
+  <div class="box" id="box">
+    <div class="ribbon"></div>
+  </div>
+</div>
+
+<div class="click-text">
+  👉 ចុចទីនេះបើកកាដូរ 🎁
+</div>
+
+<!-- Halo Glow -->
+<div id="haloContainer"></div>
+
+<!-- Flying Image -->
+<div id="imageContainer" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+  <img src="image.png" class="fly-image" id="flyImg">
+  <div class="name-tag"></div>
+</div>
+
+<!-- Greeting -->
+<div class="greeting" id="greeting">💖 Happy Valentine’s Day 💖</div>
+
+<audio id="romanticSound" loop>
+  <source src="oun-keu-chea-chi-vit.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let bubbleInterval, confettiInterval;
+
+function openGift(){
+  const gift=document.getElementById("gift");
+  const box=document.getElementById("box");
+  gift.classList.add("open");
+
+  // Lid បែក → Box បាត់
+  setTimeout(()=>{
+    box.style.opacity=0;
+
+    // Halo Glow
+    const halo=document.createElement("div");
+    halo.className="halo";
+    document.getElementById("haloContainer").appendChild(halo);
+    setTimeout(()=>halo.remove(),1200);
+
+    // រូបហោះ
+    const img=document.getElementById("flyImg");
+    img.classList.add("show");
+
+    // Greeting
+    setTimeout(()=>{
+      document.getElementById("greeting").style.opacity=1;
+    },500);
+
+    // ចម្រៀង + Bubbles + Confetti
+    const song=document.getElementById("romanticSound");
+    song.volume=0;
+    song.play();
+    fadeIn(song);
+    startBubbles();
+    startConfetti();
+
+  },600);
+}
+
+// Fade in sound
+function fadeIn(audio){
+  let v=0;
+  const interval=setInterval(()=>{
+    if(v<1){v+=0.05; audio.volume=v;}
+    else clearInterval(interval);
+  },200);
+}
+
+// Floating bubbles
+function startBubbles(){
+  bubbleInterval=setInterval(()=>{
+    let b=document.createElement("div");
+    b.className="bubble";
+    b.style.left=Math.random()*100+"%";
+    b.style.width=(10+Math.random()*15)+"px";
+    b.style.height=b.style.width;
+    b.style.animationDuration=(4+Math.random()*3)+"s";
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(),7000);
+  },250);
+}
+
+// Confetti
+function startConfetti(){
+  for(let i=0;i<50;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+</script>
+
+</body>
+</html>
